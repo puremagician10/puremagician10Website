@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hi Tiks 🌸</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      height: 100vh;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Quicksand', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .now-playing {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 20, 20, 0.85);
+      padding: 15px 25px;
+      border-radius: 20px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 300px;
+      width: 80%;
+      max-width: 500px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      z-index: 999;
+    }
+
+    .song-title {
+      font-size: 1em;
+      margin-bottom: 5px;
+      color: #fff;
+      opacity: 0.8;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .time {
+      font-size: 0.75em;
+      color: #ccc;
+      width: 40px;
+      text-align: center;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: #444;
+      border-radius: 5px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 0 2px #000;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 0 2px #000;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      margin-top: 10px;
+    }
+
+    .control-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      opacity: 0.8;
+      cursor: pointer;
+    }
+
+    .control-btn svg {
+      width: 25px;
+      height: 25px;
+      fill: #fff;
+      opacity: 0.9;
+    }
+
+    .control-btn.play svg {
+      width: 35px;
+      height: 35px;
+    }
+
+    /* Message Box */
+    .message-box {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 30px 40px;
+      border-radius: 20px;
+      max-width: 90%;
+      color: white;
+      box-shadow: 0 0 25px #ffb6f9;
+      animation: fadeIn 3s ease-in-out forwards;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeInTitle 2s ease-in forwards;
+      animation-delay: 1s;
+    }
+
+    p {
+      font-size: 1.2em;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      border-right: .15em solid #fff;
+      width: 0;
+      overflow: hidden;
+      animation: typing 6s steps(60, end) 3s forwards, blink .75s step-end infinite;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInTitle {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    /* Stars */
+    .stars {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite ease-in-out;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Now Playing -->
+  <div class="now-playing">
+    <div class="song-title">Taylor Swift – Getaway Car</div>
+    <div class="slider-container">
+      <span class="time" id="currentTime">0:00</span>
+      <input type="range" id="seekBar" value="0" min="0" max="100">
+      <span class="time" id="duration">0:00</span>
+    </div>
+    <div class="controls">
+      <button class="control-btn" id="prevBtn">
+        <svg viewBox="0 0 24 24"><path d="M6 19V5h2v14H6zm3.5-7L18 5v14l-8.5-7z"/></svg>
+      </button>
+      <button class="control-btn play" id="playToggle">
+        <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="control-btn" id="nextBtn">
+        <svg viewBox="0 0 24 24"><path d="M16 5v14h-2V5h2zm-3.5 7L6 5v14l8.5-7z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="bgm">
+    <source src="getaway-car.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Stars -->
+  <div class="stars">
+    <script>
+      for (let i = 0; i < 50; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        star.style.top = Math.random() * 100 + '%';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+        document.querySelector('.stars').appendChild(star);
+      }
+    </script>
+  </div>
+
+  <!-- Message -->
+  <div class="message-box">
+    <h1>Hi Anaaak and wifeee 💖</h1>
+    <p>
+      You remind me of the feeling I get when watching those unforgettable anime love stories — 
+      calm, real, and hard to forget.
+
+      You matter more than you know. 🌸
+    </p>
+  </div>
+
+  <!-- Player Logic -->
+  <script>
+    const audio = document.getElementById("bgm");
+    const playBtn = document.getElementById("playToggle");
+    const playIcon = document.getElementById("playIcon");
+    const seekBar = document.getElementById("seekBar");
+    const currentTimeDisplay = document.getElementById("currentTime");
+    const durationDisplay = document.getElementById("duration");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let isPlaying = false;
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    playBtn.addEventListener("click", () => {
+      if (!isPlaying) {
+        audio.play();
+        playIcon.setAttribute("d", "M6 19h4V5H6v14zm8-14h4v14h-4V5z"); // pause icon
+        isPlaying = true;
+      } else {
+        audio.pause();
+        playIcon.setAttribute("d", "M8 5v14l11-7z"); // play icon
+        isPlaying = false;
+      }
+    });
+
+    audio.addEventListener("loadedmetadata", () => {
+      durationDisplay.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      seekBar.value = (audio.currentTime / audio.duration) * 100;
+      currentTimeDisplay.textContent = formatTime(audio.currentTime);
+    });
+
+    seekBar.addEventListener("input", () => {
+      const seekTo = (seekBar.value / 100) * audio.duration;
+      audio.currentTime = seekTo;
+    });
+
+    prevBtn.addEventListener("click", () => {
+      audio.currentTime = 0;
+    });
+
+    nextBtn.addEventListener("click", () => {
+      audio.currentTime = audio.duration - 1;
+    });
+  </script>
+
+</body>
+</html>
