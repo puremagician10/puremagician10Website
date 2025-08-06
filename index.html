@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hi Tiks 🌸</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * {margin:0; padding:0; box-sizing:border-box;}
+    body {
+      height: 100vh;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Quicksand', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      flex-direction: column;
+    }
+    .now-playing {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20,20,20,0.85);
+      padding: 15px 25px;
+      border-radius: 20px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 300px;
+      width: 80%;
+      max-width: 500px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      z-index: 999;
+    }
+    .song-title {font-size:1em; margin-bottom:5px; color:#fff; opacity:0.8;}
+    .slider-container {display:flex; align-items:center; width:100%;}
+    .time {font-size:0.75em; color:#ccc; width:40px; text-align:center;}
+    input[type=range] {
+      -webkit-appearance: none; width: 100%; height: 4px;
+      background: #888; border-radius: 50px; outline: none; cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 16px; height: 16px; border-radius: 50%; background: #fff;
+      cursor: pointer; box-shadow: 0 0 4px #000; border: none;
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 16px; height: 16px; border-radius: 50%; background: #fff;
+      cursor: pointer; box-shadow: 0 0 4px #000; border: none;
+    }
+    .controls {display: flex; justify-content:center; align-items:center; gap:30px; margin-top:10px;}
+    .control-btn {background:none; border:none; cursor:pointer;}
+    .control-btn svg {width:25px; height:25px; fill:#fff; opacity:0.9;}
+    .control-btn.play svg {width:35px; height:35px;}
+    .message-box {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 30px 40px;
+      border-radius: 20px;
+      max-width: 90%;
+      max-height: 60vh;
+      overflow-y: auto;
+      color: white;
+      box-shadow: 0 0 25px #ffb6f9;
+      text-align: center;
+      margin-top: 160px;
+    }
+    h1 {font-size: 2.5em; margin-bottom: 20px;}
+    .typing {display: inline-block; overflow: hidden; white-space: nowrap; border-right: 2px solid #fff;}
+    .next-btn {
+      background: #ffb6f9; color:#000; border:none; padding:10px 20px;
+      border-radius: 20px; cursor:pointer; font-size: 1em; margin-top:20px; display: none;
+    }
+    .stars {position:absolute; width:100%; height:100%; top:0; left:0; z-index:-1; overflow:hidden;}
+    .star {position:absolute; width:2px; height:2px; background:white; border-radius:50%; animation: twinkle 2s infinite ease-in-out;}
+    @keyframes twinkle {0%,100%{opacity:0.2;} 50%{opacity:1;}}
+  </style>
+</head>
+<body>
+<div class="now-playing">
+  <div class="song-title">Katy Perry – Birthday</div>
+  <div class="slider-container">
+    <span class="time" id="currentTime">0:00</span>
+    <input type="range" id="seekBar" value="0" min="0" max="100">
+    <span class="time" id="duration">0:00</span>
+  </div>
+  <div class="controls">
+    <button class="control-btn" id="prevBtn"><svg viewBox="0 0 24 24"><path d="M6 19V5h2v14H6zm3.5-7L18 5v14l-8.5-7z"/></svg></button>
+    <button class="control-btn play" id="playToggle"><svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+    <button class="control-btn" id="nextBtn"><svg viewBox="0 0 24 24"><path d="M16 5v14h-2V5h2zm-3.5 7L6 5v14l8.5-7z"/></svg></button>
+  </div>
+</div>
+<audio id="bgm"><source src="birthday.mp3" type="audio/mpeg"></audio>
+<div class="stars"><script>for (let i=0;i<50;i++){const s=document.createElement('div');s.classList.add('star');s.style.top=Math.random()*100+'%';s.style.left=Math.random()*100+'%';s.style.animationDuration=(Math.random()*2+1)+'s';document.querySelector('.stars').appendChild(s);}</script></div>
+<div class="message-box" id="messageBox">
+  <h1>Hi Tiks 💖</h1>
+  <p><span class="typing" id="message"></span></p>
+</div>
+<!-- Surprise Reveal Box -->
+<div id="revealBox" style="display: none; text-align: center; margin-top: 20px;">
+  <button id="revealButton" style="padding: 15px 30px; background: rgba(255,255,255,0.15); border: 2px solid #fff; border-radius: 30px; color: #fff; font-size: 1.1em; cursor: pointer; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(255,255,255,0.3); transition: all 0.3s ease;">✨ Click here for a surprise 💫</button>
+  <div id="gifContainer" style="margin-top: 20px; display: none;">
+    <img src="surprise.gif" alt="Surprise GIF" style="max-width: 90%; border-radius: 20px; box-shadow: 0 0 20px #ffb6f9;">
+    <br><br>
+    <button id="goBack" style="padding: 15px 30px; background: rgba(255,255,255,0.15); border: 2px solid #fff; border-radius: 30px; color: #fff; font-size: 1.1em; cursor: pointer; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(255,255,255,0.3); transition: all 0.3s ease;">⬅️ Go Back</button>
+  </div>
+</div>
+<script>
+const audio = document.getElementById("bgm"),
+  playBtn = document.getElementById("playToggle"),
+  playIcon = document.getElementById("playIcon"),
+  seekBar = document.getElementById("seekBar"),
+  currentTimeDisplay = document.getElementById("currentTime"),
+  durationDisplay = document.getElementById("duration"),
+  prevBtn = document.getElementById("prevBtn"),
+  nextBtn = document.getElementById("nextBtn");
+
+let isPlaying = false;
+function formatTime(t) {
+  const e = Math.floor(t / 60),
+        n = Math.floor(t % 60);
+  return `${e}:${n < 10 ? "0" : ""}${n}`;
+}
+
+playBtn.addEventListener("click", () => {
+  if (isPlaying) {
+    audio.pause();
+    playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+  } else {
+    audio.play();
+    playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14h4v14h-4V5z"/>';
+  }
+  isPlaying = !isPlaying;
+});
+
+audio.addEventListener("loadedmetadata", () => {
+  durationDisplay.textContent = formatTime(audio.duration);
+});
+
+audio.addEventListener("timeupdate", () => {
+  seekBar.value = (audio.currentTime / audio.duration) * 100;
+  currentTimeDisplay.textContent = formatTime(audio.currentTime);
+});
+
+seekBar.addEventListener("input", () => {
+  audio.currentTime = (seekBar.value / 100) * audio.duration;
+});
+
+prevBtn.addEventListener("click", () => {
+  audio.currentTime = 0;
+});
+
+nextBtn.addEventListener("click", () => {
+  audio.currentTime = audio.duration - 1;
+});
+
+// ⬇️⬇️⬇️ PLACE YOUR MESSAGES HERE ⬇️⬇️⬇️
+const messages = [
+  `Happy Birthday Tiks, May this year bring you closer to your dreams,
+bless you with good health, and surround you with genuine love and joy.
+
+Even when life asks for courage,
+may you find pockets of pure, unexpected happiness this year.
+May every step forward bring you closer to your dreams
+and fill you with quiet pride.
+May your health be a steady anchor,
+your heart be held by true love,
+and your spirit feel joy,
+not because challenges vanish,
+but because you feel deeply seen, supported,
+and strong enough to embrace light even on tough days.
+
+Please Be Happy.
+Not every day, not every hour,
+but in those soft moments that remind you:
+You are worthy of warmth.
+You are held.
+You belong here. 💚`
+];
+// ⬆️⬆️⬆️ PLACE YOUR MESSAGES HERE ⬆️⬆️⬆️
+
+const messageEl = document.getElementById("message"),
+      messageBox = document.getElementById("messageBox"),
+      revealBox = document.getElementById("revealBox"),
+      gifContainer = document.getElementById("gifContainer"),
+      revealButton = document.getElementById("revealButton"),
+      goBackBtn = document.getElementById("goBack");
+
+function typeWriter(text, i = 0) {
+  if (i < text.length) {
+    messageEl.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
+    setTimeout(() => typeWriter(text, i + 1), 20);
+  } else {
+    revealBox.style.display = "block";
+  }
+}
+
+typeWriter(messages[0]);
+
+revealButton.addEventListener("click", () => {
+  messageBox.style.display = "none";
+  gifContainer.style.display = "block";
+});
+
+goBackBtn.addEventListener("click", () => {
+  gifContainer.style.display = "none";
+  messageBox.style.display = "block";
+});
+</script>
+</body>
+</html>
